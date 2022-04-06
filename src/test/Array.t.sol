@@ -332,3 +332,49 @@ contract RefArrayTest is DSTest {
         emit log_named_uint("builtin gas", g1 - g2);
     }
 }
+contract Bytes32RefArrayTest is DSTest {
+    using Bytes32RefArrayLib for Array;
+    function setUp() public {}
+
+    function testArray() public {
+        Array pa = Bytes32RefArrayLib.newArray(5);
+        // safe pushes
+        pa.unsafe_push(bytes32(uint256(125)));
+        pa.unsafe_push(bytes32(uint256(126)));
+        pa.unsafe_push(bytes32(uint256(127)));
+        pa.unsafe_push(bytes32(uint256(128)));
+        pa.unsafe_push(bytes32(uint256(129)));
+        pa.push(bytes32(uint256(130)));
+        pa.push(bytes32(uint256(131)));
+        pa.push(bytes32(uint256(132)));
+        pa.push(bytes32(uint256(133)));
+        pa.push(bytes32(uint256(134)));
+        pa.push(bytes32(uint256(135)));
+        for (uint256 i; i < 11; i++) {
+            assertEq(pa.get(i), bytes32(uint256(125 + i)));
+        }
+    }
+
+    function testMemoryInterruption() public {
+        Array pa = Bytes32RefArrayLib.newArray(5);
+        // safe pushes
+        pa.unsafe_push(bytes32(uint256(125)));
+        pa.unsafe_push(bytes32(uint256(126)));
+        pa.unsafe_push(bytes32(uint256(127)));
+        pa.unsafe_push(bytes32(uint256(128)));
+        pa.unsafe_push(bytes32(uint256(129)));
+
+        Bytes32RefArrayLib.newArray(5);
+
+        pa.push(bytes32(uint256(130)));
+        pa.push(bytes32(uint256(131)));
+        pa.push(bytes32(uint256(132)));
+        pa.push(bytes32(uint256(133)));
+        pa.push(bytes32(uint256(134)));
+        pa.push(bytes32(uint256(135)));
+        for (uint256 i; i < 11; i++) {
+            assertEq(pa.get(i), bytes32(uint256(125 + i)));
+        }
+    }
+
+}
